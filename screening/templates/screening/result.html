@@ -1,0 +1,91 @@
+{% extends "screening/base.html" %}
+
+{% block title %}Result — {{ prediction }} | Resume Screening AI{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header__icon">🧠</div>
+        <h1 class="header__title">Screening Result</h1>
+        <p class="header__subtitle">AI-powered prediction complete</p>
+    </header>
+
+    <!-- Result Card -->
+    <div class="card result-card" id="result-card">
+
+        <!-- Icon -->
+        <div class="result-icon {% if is_hired %}result-icon--hire{% else %}result-icon--reject{% endif %}">
+            {% if is_hired %}✅{% else %}❌{% endif %}
+        </div>
+
+        <!-- Prediction -->
+        <div class="result-label">Prediction</div>
+        <h2 class="result-prediction {% if is_hired %}result-prediction--hire{% else %}result-prediction--reject{% endif %}" id="prediction-text">
+            {{ prediction }}
+        </h2>
+
+        <!-- Confidence Meter -->
+        <div class="confidence-section">
+            <div class="confidence-label">Confidence Score</div>
+            <div class="confidence-bar-track">
+                <div class="confidence-bar-fill {% if is_hired %}confidence-bar-fill--hire{% else %}confidence-bar-fill--reject{% endif %}"
+                     style="width: {{ confidence }}%"
+                     id="confidence-bar">
+                </div>
+            </div>
+            <div class="confidence-value {% if is_hired %}confidence-value--hire{% else %}confidence-value--reject{% endif %}" id="confidence-text">
+                {{ confidence }}%
+            </div>
+        </div>
+
+        <!-- Probability Breakdown -->
+        <div class="prob-grid">
+            {% for label, prob in probabilities.items %}
+                <div class="prob-item {% if label == 'Hire' %}prob-item--hire{% else %}prob-item--reject{% endif %}">
+                    <div class="prob-item__label">{{ label }}</div>
+                    <div class="prob-item__value" style="color: {% if label == 'Hire' %}var(--color-success){% else %}var(--color-danger){% endif %}">
+                        {{ prob }}%
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Candidate Summary -->
+        <div class="candidate-summary">
+            <div class="candidate-summary__title">Candidate Profile</div>
+            <div class="candidate-summary__grid">
+                <div class="summary-item">
+                    <span class="summary-item__label">Skills</span>
+                    <span class="summary-item__value" id="summary-skills">{{ skills }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-item__label">Experience</span>
+                    <span class="summary-item__value" id="summary-experience">{{ experience }} years</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-item__label">Education</span>
+                    <span class="summary-item__value" id="summary-education">{{ education }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-item__label">Projects</span>
+                    <span class="summary-item__value" id="summary-projects">{{ projects_count }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="result-actions">
+            <a href="{% url 'screening:form' %}" class="btn btn--primary" id="try-again-btn">
+                🔄 Screen Another
+            </a>
+            <a href="{% url 'screening:form' %}#bulk-upload-section" class="btn btn--secondary" id="bulk-btn">
+                📊 Bulk Upload
+            </a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

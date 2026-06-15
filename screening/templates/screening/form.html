@@ -1,0 +1,153 @@
+{% extends "screening/base.html" %}
+
+{% block title %}Resume Screening AI — Evaluate Candidates{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header__icon">🧠</div>
+        <h1 class="header__title">Resume Screening AI</h1>
+        <p class="header__subtitle">Intelligent candidate evaluation powered by Machine Learning</p>
+    </header>
+
+    <!-- Django Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert--{{ message.tags }}" role="alert">
+                <span>⚠️</span>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Single Candidate Form -->
+    <section class="card" id="single-candidate-section">
+        <h2 class="card__title">
+            <span>👤</span> Screen a Candidate
+        </h2>
+        <p class="card__description">Enter candidate details below to get an instant hire/reject prediction with confidence score.</p>
+
+        <form method="POST" action="{% url 'screening:predict' %}" id="candidate-form" novalidate>
+            {% csrf_token %}
+
+            <!-- Skills -->
+            <div class="form-group">
+                <label class="form-label" for="skills-input">Skills</label>
+                {{ form.skills }}
+                {% if form.skills.help_text %}
+                    <span class="form-help">{{ form.skills.help_text }}</span>
+                {% endif %}
+                {% if form.skills.errors %}
+                    {% for error in form.skills.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Experience -->
+            <div class="form-group">
+                <label class="form-label" for="experience-input">Experience (Years)</label>
+                {{ form.experience }}
+                {% if form.experience.errors %}
+                    {% for error in form.experience.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Education -->
+            <div class="form-group">
+                <label class="form-label" for="education-input">Education</label>
+                {{ form.education }}
+                {% if form.education.errors %}
+                    {% for error in form.education.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Projects Count -->
+            <div class="form-group">
+                <label class="form-label" for="projects-input">Projects Count</label>
+                {{ form.projects_count }}
+                {% if form.projects_count.errors %}
+                    {% for error in form.projects_count.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="predict-btn">
+                🔍 Analyze Candidate
+            </button>
+        </form>
+    </section>
+
+    <!-- Divider -->
+    <div class="divider">or</div>
+
+    <!-- Resume Upload -->
+    <section class="card" id="resume-upload-section">
+        <h2 class="card__title">
+            <span>📄</span> Upload Resume
+        </h2>
+        <p class="card__description">Upload a resume to automatically extract details and evaluate.</p>
+
+        <form method="POST" action="{% url 'screening:resume_upload' %}" enctype="multipart/form-data" id="resume-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="resume-upload-input">Upload Resume (PDF, DOCX, TXT)</label>
+                {{ resume_form.resume_file }}
+                {% if resume_form.resume_file.help_text %}
+                    <span class="form-help">{{ resume_form.resume_file.help_text }}</span>
+                {% endif %}
+                {% if resume_form.resume_file.errors %}
+                    {% for error in resume_form.resume_file.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full" id="resume-upload-btn" style="background: var(--gradient-primary);">
+                📤 Parse &amp; Analyze Resume
+            </button>
+        </form>
+    </section>
+
+    <!-- Divider -->
+    <div class="divider">or</div>
+
+    <!-- Bulk Upload -->
+    <section class="card" id="bulk-upload-section">
+        <h2 class="card__title">
+            <span>📊</span> Bulk Screening
+        </h2>
+        <p class="card__description">Upload a CSV file with multiple candidates to rank them by hire probability.</p>
+
+        <form method="POST" action="{% url 'screening:bulk_upload' %}" enctype="multipart/form-data" id="bulk-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="csv-upload-input">Upload CSV</label>
+                {{ bulk_form.csv_file }}
+                {% if bulk_form.csv_file.help_text %}
+                    <span class="form-help">{{ bulk_form.csv_file.help_text }}</span>
+                {% endif %}
+                {% if bulk_form.csv_file.errors %}
+                    {% for error in bulk_form.csv_file.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn--success btn--full" id="bulk-upload-btn">
+                📤 Upload &amp; Rank Candidates
+            </button>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

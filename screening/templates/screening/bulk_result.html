@@ -1,0 +1,108 @@
+{% extends "screening/base.html" %}
+
+{% block title %}Bulk Results — {{ total }} Candidates | Resume Screening AI{% endblock %}
+
+{% block content %}
+<div class="container container--wide">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header__icon">📊</div>
+        <h1 class="header__title">Bulk Screening Results</h1>
+        <p class="header__subtitle">{{ filename }} — {{ total }} candidates ranked by hire probability</p>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="bulk-header">
+        <div class="bulk-stats">
+            <span class="stat-badge stat-badge--total" id="stat-total">
+                👥 {{ total }} Total
+            </span>
+            <span class="stat-badge stat-badge--hire" id="stat-hired">
+                ✅ {{ hired_count }} Hire
+            </span>
+            <span class="stat-badge stat-badge--reject" id="stat-rejected">
+                ❌ {{ rejected_count }} Reject
+            </span>
+        </div>
+        <a href="{% url 'screening:form' %}" class="btn btn--secondary" id="back-btn">
+            ← Back to Form
+        </a>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-wrap">
+            <table class="data-table" id="results-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Skills</th>
+                        <th>Exp (Yrs)</th>
+                        <th>Education</th>
+                        <th>Projects</th>
+                        <th>Decision</th>
+                        <th>Hire %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                        <tr>
+                            <td>
+                                <span class="rank-badge {% if r.rank <= 3 %}rank-badge--top{% else %}rank-badge--normal{% endif %}">
+                                    {{ r.rank }}
+                                </span>
+                            </td>
+                            <td>{{ r.name }}</td>
+                            <td class="skills-cell" title="{{ r.skills }}">{{ r.skills }}</td>
+                            <td>{{ r.experience }}</td>
+                            <td>{{ r.education }}</td>
+                            <td>{{ r.projects_count }}</td>
+                            <td>
+                                <span class="status-chip {% if r.is_hired %}status-chip--hire{% else %}status-chip--reject{% endif %}">
+                                    {% if r.is_hired %}✓ Hire{% else %}✗ Reject{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="confidence-mini" style="color: {% if r.hire_prob >= 50 %}var(--color-success){% else %}var(--color-danger){% endif %}">
+                                    {{ r.hire_prob }}%
+                                </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+                                No valid candidates found in the uploaded file.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Errors -->
+    {% if errors %}
+        <div class="error-list" id="error-section">
+            <div class="error-list__title">⚠️ {{ errors|length }} row(s) had issues:</div>
+            <ul class="error-list__items">
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="result-actions" style="margin-top: 2rem;">
+        <a href="{% url 'screening:form' %}" class="btn btn--primary" id="upload-another-btn">
+            📤 Upload Another CSV
+        </a>
+        <a href="{% url 'screening:form' %}" class="btn btn--secondary" id="single-screen-btn">
+            👤 Single Screening
+        </a>
+    </div>
+
+</div>
+{% endblock %}
